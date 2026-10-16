@@ -65,5 +65,17 @@ router.post('/readCustomerInfoAndRespond', function(req, res, next) {
   );
 });
 
+// Receive customer information as JSON and return a JSON response.
+// Browser JavaScript uses this response to update the current page.
+router.post('/api/customer', function(req, res) {
+  var name = req.body.name;
+  var email = req.body.email;
+
+  res.json({
+    message: "Welcome " + name,
+    email: email
+  });
+});
+
 // Export the router so app.js can mount these routes.
 module.exports = router;

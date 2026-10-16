@@ -91,5 +91,73 @@
 
     <input type="submit" value="Go">
   </form>
+
+<br><br><br>
+<hr>
+
+<h2>Customer Form Using Fetch</h2>
+<p>This form displays the response without reloading the page.</p>
+
+<form id="customerFetchForm">
+  <label for="fetchName">Name:</label>
+  <input type="text" id="fetchName" name="name" required>
+  <br>
+
+  <label for="fetchEmail">Email:</label>
+  <input type="email" id="fetchEmail" name="email" required>
+  <br>
+
+  <button type="submit">Submit with Fetch</button>
+</form>
+
+<!-- JavaScript places the server's response here. -->
+<div id="result" aria-live="polite"></div>
+
+<script>
+  var customerForm = document.getElementById("customerFetchForm");
+  var result = document.getElementById("result");
+
+  customerForm.addEventListener("submit", async function(event) {
+    // Stop normal form submission so the browser stays on this page.
+    event.preventDefault();
+    result.textContent = "Submitting...";
+
+    try {
+      // Send the customer's information to Express as JSON.
+      // A relative URL works both locally and on Cloud Run.
+      var response = await fetch("/api/customer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: document.getElementById("fetchName").value,
+          email: document.getElementById("fetchEmail").value
+        })
+      });
+
+      // Treat an unsuccessful HTTP status as an error.
+      if (!response.ok) {
+        throw new Error("Request failed: " + response.status);
+      }
+
+      // Convert the JSON response into a JavaScript object.
+      var data = await response.json();
+
+      // Display returned values as text within the existing page.
+      var message = document.createElement("p");
+      message.textContent = data.message;
+
+      var email = document.createElement("p");
+      email.textContent = "We will contact you at " + data.email;
+
+      result.replaceChildren(message, email);
+    } catch (error) {
+      result.textContent = "Unable to submit. Please try again.";
+      console.error(error);
+    }
+  });
+</script>
+
 </body>
 </html>

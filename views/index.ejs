@@ -1,48 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+
+  <!-- Express passes the title value when rendering this EJS template. -->
   <title><%= title %></title>
-  <link rel='stylesheet' href='/stylesheets/style.css' />
+
+  <!-- Express serves this stylesheet from the public directory. -->
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
+
 <body>
-<h1><%= title %></h1>
-<p>Welcome to <%= title %>.   Let's test reading get+post data</p>
+  <!-- EJS inserts the title as escaped text. -->
+  <h1><%= title %></h1>
+  <p>
+    Welcome to <%= title %>.
+    Let's test reading GET and POST data.
+  </p>
 
-<br/><br/>
-<b>New Customer Form </b> to test POST request and reading data using URI  /readNameAndRespond
-<br/>
-<form action="/readCustomerInfoAndRespond" method="post">
+  <br><br>
 
-  Name: <input type="text" name="name"> </input>
-  <br/>
-  Email: <input type="text" name="email"> </input>
-  <br/>
-  <input type="submit" value="Go"/>
-</form>
+  <!--
+    Traditional customer form:
+    POST sends the named fields in the request body.
+    Express reads req.body.name and req.body.email, then returns HTML.
+    The browser navigates to that response.
+  -->
+  <b>New Customer Form</b>
+  to test POST requests using /readCustomerInfoAndRespond
+  <br>
 
-<br><br><br>
-<hr>
+  <form action="/readCustomerInfoAndRespond" method="post">
+    <label>
+      Name:
+      <input type="text" name="name">
+    </label>
+    <br>
 
-<b>Form to test GET request</b> and reading the data using URI /readNameAndRespond
-<br/>
-<form action="/readNameAndRespond" method="get">
+    <label>
+      Email:
+      <input type="text" name="email">
+    </label>
+    <br>
 
-  Name: <input type="text" name="name"> </input>
-  <br/>
-  <input type="submit" value="Go"/>
-</form>
-<br><br><br>
-<hr>
-<b>Form to test POST request</b> and reading data using URI  /readNameAndRespond
-<br/>
-<form action="/readNameAndRespond" method="post">
+    <input type="submit" value="Go">
+  </form>
 
-  Name: <input type="text" name="name"> </input>
-  <br/>
-  <input type="submit" value="Go"/>
-</form>
+  <br><br><br>
+  <hr>
 
+  <!--
+    GET form:
+    The browser adds the field to the URL as a query string.
+    Example: /readNameAndRespond?name=Lynne
+    Express reads the value through req.query.name.
+  -->
+  <b>Form to test GET requests</b>
+  using /readNameAndRespond
+  <br>
 
+  <form action="/readNameAndRespond" method="get">
+    <label>
+      Name:
+      <input type="text" name="name">
+    </label>
+    <br>
 
+    <input type="submit" value="Go">
+  </form>
+
+  <br><br><br>
+  <hr>
+
+  <!--
+    POST form:
+    The field is sent in the request body rather than the URL.
+    Express reads it through req.body.name.
+    The HTTP method distinguishes this route from the GET route above.
+  -->
+  <b>Form to test POST requests</b>
+  using /readNameAndRespond
+  <br>
+
+  <form action="/readNameAndRespond" method="post">
+    <label>
+      Name:
+      <input type="text" name="name">
+    </label>
+    <br>
+
+    <input type="submit" value="Go">
+  </form>
 </body>
 </html>

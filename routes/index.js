@@ -1,78 +1,69 @@
 /**
- * NodeJS + Express (w/ ejs) code to test reading form data and returning a response.
+ * Defines the homepage and routes used to demonstrate form processing.
  *
+ * Values can arrive in three places:
+ * req.params: named sections of the URL, such as /read/Lynne
+ * req.query: query strings, such as ?name=Lynne
+ * req.body: data submitted in the request body, such as a POST form
+ *
+ * These routes return HTML or text. The JSON API will be added
+ * separately for Lab 8.2.
  */
 
 var express = require('express');
 var router = express.Router();
 
-//########################################
-//to process data sent in on request need body-parser module
+// The starter uses body-parser to read incoming request bodies.
 var bodyParser = require('body-parser');
-var path = require ('path'); //to work with separtors on any OS including Windows
 
-var querystring = require('querystring'); //for use in GET Query string of form URI/path?name=value
+// Parse JSON bodies and URL-encoded HTML form submissions.
+// app.js also configures body parsing before mounting this router.
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: true }));
 
-router.use(bodyParser.json()); // for parsing application/json
-
-router.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-//#########################################
-
-/* GET home page. */
+// Render views/index.ejs when the browser requests the homepage.
+// The title value is passed to the EJS template.
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'ReadFormDataSaveMongoDB' });
 });
 
-// GET with  URI  /read/Lynne   which means name=Lynne
+// Read a name from a URL path parameter.
+// Example: GET /read/Lynne returns "hello Lynne".
 router.get('/read/:name', function(req, res, next) {
-  //expecting data variable called name --retrieve value using body-parser
-  var body = JSON.stringify(req.body);  //if wanted entire body as JSON
-  var params = JSON.stringify(req.params);//if wanted parameters
-  var value_name = req.params.name;  //retrieve the data associated with name
-  res.send("hello " + value_name);
-})
+  var value_name = req.params.name;
 
-/* the URI /readNameAndRespond */
-
-// GET with URI with querry  /readNameAndRespond?name=Lynne
-router.get('/readNameAndRespond', function(req, res, next) {
-  //expecting data variable called name --retrieve value using body-parser
-  var body = JSON.stringify(req.body);  //if wanted entire body as JSON
-  var params = JSON.stringify(req.params);//if wanted parameters
-  var query = req.query;  //if wanted the query
-  var value_name = req.query.name;  //retrieve the data associated with name
   res.send("hello " + value_name);
 });
 
+// Read a name from the URL's query string.
+// Example: GET /readNameAndRespond?name=Lynne.
+router.get('/readNameAndRespond', function(req, res, next) {
+  var value_name = req.query.name;
 
-//Processing Post to read post data called name
-//now processing post
+  res.send("hello " + value_name);
+});
+
+// Read a name from a POST request body.
+// Although the path matches the GET route above, Express selects
+// this handler because the incoming HTTP method is POST.
 router.post('/readNameAndRespond', function(req, res, next) {
+  var value_name = req.body.name;
 
-  //expecting data variable called name --retrieve value using body-parser
-  var body = JSON.stringify(req.body);  //if wanted entire body as JSON
-  var params = JSON.stringify(req.params);//if wanted parameters
-  var value_name = req.body.name;  //retrieve the data associated with name
   res.send("hello now " + value_name);
 });
 
-
-
-
-
-
-//Processing Post to read post data called name
-//now processing post
+// Process the traditional customer form's POST submission.
+// The body parser makes its name and email fields available in req.body.
+// Returning HTML causes a normal form submission to navigate to this response.
 router.post('/readCustomerInfoAndRespond', function(req, res, next) {
+  var value_name = req.body.name;
+  var value_email = req.body.email;
 
-  //expecting data variable called name --retrieve value using body-parser
-  var body = JSON.stringify(req.body);  //if wanted entire body as JSON
-  var params = JSON.stringify(req.params);//if wanted parameters
-  var value_name = req.body.name;  //retrieve the data associated with name
-  var value_email = req.body.email;  //retrieve the data associated with email
-  res.send("Welcome,  " + value_name + "</br> We will reach you at: " + value_email);
-
-
+  res.send(
+    "Welcome,  " + value_name +
+    "</br> We will reach you at: " + value_email
+  );
 });
 
+// Export the router so app.js can mount these routes.
 module.exports = router;

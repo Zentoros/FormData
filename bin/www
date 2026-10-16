@@ -1,48 +1,47 @@
 #!/usr/bin/env node
 
 /**
- * Module dependencies.
+ * Starts the HTTP server for the Express application.
+ * package.json runs this file when you enter npm start.
  */
 
+// Import the configured Express application.
 var app = require('../app');
+
+// Debug messages appear when DEBUG=formdata:server is enabled.
 var debug = require('debug')('formdata:server');
+
+// Use Node's HTTP module to create the server.
 var http = require('http');
 
-/**
- * Get port from environment and store in Express.
- */
-
+// Cloud Run supplies PORT through an environment variable.
+// Locally, use port 3000 when PORT is not set.
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
+// Pass incoming HTTP requests to the Express application.
 var server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
+// Start accepting connections on the selected port.
+// Omitting a hostname allows connections on all network interfaces.
 server.listen(port);
+
+// Register handlers for startup errors and successful startup.
 server.on('error', onError);
 server.on('listening', onListening);
 
 /**
- * Normalize a port into a number, string, or false.
+ * Convert a numeric port string into a number.
+ * Preserve named pipe strings and reject negative port numbers.
  */
-
 function normalizePort(val) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
-    // named pipe
     return val;
   }
 
   if (port >= 0) {
-    // port number
     return port;
   }
 
@@ -50,10 +49,10 @@ function normalizePort(val) {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Explain common errors that prevent the server from listening.
  */
-
 function onError(error) {
+  // Let unexpected errors propagate.
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -62,29 +61,34 @@ function onError(error) {
     ? 'Pipe ' + port
     : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
+      // The process does not have permission to use this port.
       console.error(bind + ' requires elevated privileges');
       process.exit(1);
       break;
+
     case 'EADDRINUSE':
+      // Another process is already listening on this port.
       console.error(bind + ' is already in use');
       process.exit(1);
       break;
+
     default:
       throw error;
   }
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Report the listening address through the debug logger.
+ * This message is hidden unless the DEBUG setting is enabled.
  */
-
 function onListening() {
   var addr = server.address();
+
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
+
   debug('Listening on ' + bind);
 }
